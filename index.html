@@ -1,0 +1,203 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title>LID Atlas</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="https://use.typekit.net/baj5duk.css">
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet' />
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+  <div id="load"></div>
+  <nav class="header">
+    <div class="container" id="nav">
+    <a href="index.html" class="logo">Grant Money Distribution</a>
+  </nav>
+
+
+  
+  <div  id="contents" class="container">
+      <div class="content">
+      <div class="map-filters">
+        <!--<div class="row">
+          <div class="col">
+              <input class="form-control" id="search" type="text" placeholder="Search..."/>
+          </div>
+      </div>-->
+      <span class="dropdown-institution">
+        <h3>Institution Type</h3>
+        <select id="institution" class="dropdown" name="institution" size="1">    
+          <option value="all">All</option>
+          <option value="education" >Higher Education</option>
+          <option value="business" >Business</option>
+          <option value="other" >Other</option>
+        </select>
+        <span class="dropdown-directorate">
+          <h3>Directorate</h3>
+          <select id="directorate" class="dropdown" name="directorate" size="1">    
+            <option value="all">All</option>
+						<option value="EHR" >Direct For Education and Human Resources</option>
+            <option value="ENG" >Directorate For Engineering</option>
+            <option value="TIP" >Dir for Tech, Innovation, & Partnerships</option>
+            <option value="BIO" >Direct For Biological Sciences</option>
+            <option value="MPS" >Direct For Mathematical & Physical Science</option>
+            <option value="SBE" >Direct For Social, Behav & Economic Science</option>
+            <option value="GEO" >Directorate For Geosciences</option>
+            <option value="CSE" >Direct For Computer & Info Scie & Enginr</option>
+          </select>
+        </span><span class="dropdown-year">
+          <h3>Year</h3>
+            <select id="year" class="dropdown" name="year" size="1">    
+              <option value="all">All</option>
+              <option value="AL" >2013</option>
+              <option value="AK" >2014</option>
+              <option value="AZ" >2015</option>
+            </select>  
+        </span>
+      </span>
+    <h3>Legend:</h3>
+    <div class="legend"><div class="square blue"></div><p>Higher Education</p></div>
+    <div class="legend"><div class="square red"></div><p>Business</p></div>
+    <div class="legend"><div class="square yellow"></div><p>Other</p></div>
+    <!--<button id="list-map-btn">Show List</button>
+  </div>
+  <div id="list">
+    <h3 style="margin-top: 0"></h3>
+    <ul id="gathered_info"></ul>
+  </div>-->
+    <div>
+      <div id="map"></div>
+      
+    </div>
+    </div>
+
+    
+        
+  </div>
+  
+
+  
+  <!--[if IE]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+  <script src="js/vendor/modernizr-3.8.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
+  <script src="js/plugins.js"></script>
+  <script src="js/main.js"></script>
+  
+
+  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set','transport','beacon'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async></script>
+
+
+  <script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoidGhlbmF0YXR0YWNrIiwiYSI6ImNrcWIzb2xqYzA4bGcydXBvOWk5cnpvdWgifQ.EEs2Ox8pWunarciy6oAptA';
+
+
+let map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/mapbox/streets-v11',
+center: [-72.7, 41.6],
+zoom: 8
+});
+
+
+
+//clear current map, get data, put data into array, map data
+
+var currentMarkers=[]
+
+async function getData(){
+  if (currentMarkers!=null){
+    for (var i = currentMarkers.length - 1; i >= 0; i--){
+      currentMarkers[i].remove();
+    }
+  }
+  const response = await fetch("grantmoney.json")
+  var data = await response.json()
+  for (i in data){
+    var el = document.createElement('div');
+    
+    if (data[i].Institution_type === "Higher Education"){
+      el.className = 'marker-blue';
+    }
+    else if (data[i].Institution_type === "Business"){
+      el.className = 'marker-red';
+    }
+    else if (data[i].Institution_type === "Other"){
+      el.className = 'marker-yellow';
+    }
+    var marker = new mapboxgl.Marker(el)
+    .setLngLat([data[i].longitude, data[i].latitude])
+    .setPopup(
+    new mapboxgl.Popup({ offset: 25 }) // add popups
+    .setHTML(
+    '<h3>' +
+    data[i].Institution_name +
+    '</h3><p>' +
+    data[i].Award_Title +
+    '</p>'
+    )
+    )
+    .addTo(map);
+   currentMarkers.push(marker)
+  }
+  
+}
+
+var projects = []
+var statevalue = ""
+
+var state = document.getElementById('institution')
+
+//state filter dropdown
+state.addEventListener('change', () => {
+  statevalue = '&state='+state.value
+  if (state.value==='all'){
+    statevalue = ""
+  }
+  getData()
+})
+
+  //show loading sign until ready to display
+  document.onreadystatechange = function () {
+  var state = document.readyState
+  if (state == 'interactive') {
+       document.getElementById('contents').style.visibility="hidden";
+  } else if (state == 'complete') {
+      setTimeout(function(){
+         document.getElementById('interactive');
+         document.getElementById('load').style.visibility="hidden";
+         document.getElementById('contents').style.visibility="visible";
+      },1000);
+  }
+}
+
+  getData()
+
+  </script>
+
+</body>
+
+</html>
+
