@@ -2,19 +2,112 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Create and style clusters</title>
+<title>Cluster Map</title>
 <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
-<style>
-body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; }
-</style>
+<link rel="stylesheet" href="css/normalize.css">
+<link rel="stylesheet" href="css/main.css">
+<link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
-<div id="map"></div>
+    <div id="load"></div>
+    <nav class="header">
+      <div class="container" id="nav">
+      <div class="top-filters">
+        <div>
+      <span class="dropdown-institution">
+        <h4>Institution Type</h4>
+        <select id="institution" class="dropdown" name="institution" size="1">    
+          <option value="all">All</option>
+          <option value="education" >Higher Education</option>
+          <option value="business" >Business</option>
+          <option value="other" >Other</option>
+        </select>
+        </span>
+        </div>
+        <div>
+        <span class="dropdown-directorate">
+          <h4>Directorate</h4>
+          <select id="directorate" class="dropdown" name="directorate" size="1">    
+            <option value="all">All</option>
+                        <option value="EHR" >Direct For Education and Human Resources</option>
+            <option value="ENG" >Directorate For Engineering</option>
+            <option value="TIP" >Dir for Tech, Innovation, & Partnerships</option>
+            <option value="BIO" >Direct For Biological Sciences</option>
+            <option value="MPS" >Direct For Mathematical & Physical Science</option>
+            <option value="SBE" >Direct For Social, Behav & Economic Science</option>
+            <option value="GEO" >Directorate For Geosciences</option>
+            <option value="CSE" >Direct For Computer & Info Scie & Enginr</option>
+          </select>
+        </div>
+        <div>
+        </span><span class="dropdown-year">
+          <h4>Year</h4>
+            <select id="year" class="dropdown" name="year" size="1">    
+              <option value="all">All</option>
+              <option value="2011" >2011</option>
+              <option value="2012" >2012</option>
+              <option value="2013" >2013</option>
+              <option value="2014" >2014</option>
+              <option value="2015" >2015</option>
+              <option value="2016" >2016</option>
+              <option value="2017" >2017</option>
+              <option value="2018" >2018</option>
+              <option value="2019" >2019</option>
+              <option value="2020" >2020</option>
+              <option value="2021" >2021</option>
+            </select>  
+        </span>
+        </div>
+      </span>
+    </div>
+    </nav>
+  
+    <div  id="contents" class="container">
+        <div class="content">
+        <div class="map-filters">
+            <h2 id="resultnum">Results:</h2>
+      <ul id="listresult">
+      </ul>
+      <div>
+        <div id="map"></div>
+        
+      </div>
+      </div>
+  
+      
+          
+    </div>
 
 <script>
+    results = [];
+    listresult = document.getElementById('listresult')
+    async function getMarkers(){
+        const response = await fetch("grantmoney.json");
+        return await response.json();
+    }
+    async function findResults(){
+        results = [];
+        let allResults = await this.getMarkers();
+        document.getElementById("resultnum").innerHTML="Results:" + allResults.length
+        allResults.forEach(listing => {
+            var listitem = document.createElement("li")
+            var listaward = document.createElement("p")
+            listaward.innerHTML = listing.Award_Title
+            var listname = document.createElement("h4")
+            listname.innerHTML = listing.Institution_name
+            listitem.appendChild(listname)
+            listitem.appendChild(listaward)
+            listresult.appendChild(listitem)
+        }
+        );
+    }
+
+    findResults()
+
+
+
 	mapboxgl.accessToken = 'pk.eyJ1IjoidGhlbmF0YXR0YWNrIiwiYSI6ImNrcWIzb2xqYzA4bGcydXBvOWk5cnpvdWgifQ.EEs2Ox8pWunarciy6oAptA';
     const map = new mapboxgl.Map({
         container: 'map',
@@ -30,7 +123,7 @@ body { margin: 0; padding: 0; }
         map.addSource('data', {
             type: 'geojson',
             // Point to GeoJSON data.
-            data: 'trees.geojson',
+            data: 'zipcodes.geojson',
             cluster: true,
             clusterMaxZoom: 14, // Max zoom to cluster points on
             clusterRadius: 80 // Radius of each cluster when clustering points (defaults to 50)
@@ -50,15 +143,17 @@ body { margin: 0; padding: 0; }
                 'circle-color': [
                     'step',
                     ['get', 'point_count'],
-                    '#73B9EE',
+                    'rgba(115, 185, 238,0.7)',
                     10,
-                    '#5494DA',
+                    'rgba(84, 148, 218,0.7)',
                     20,
-                    '#3373C4',
+                    'rgba(51, 115, 196,0.7)',
                     30,
-                    '#1750AC',
+                    'rgba(23, 80, 172,0.7)',
                     40,
-                    '#003396'
+                    'rgba(0, 51, 150,0.7)',
+                    50,
+                    'rgba(0, 37, 110,0.7)'
                 ],
                 'circle-radius': [
                     'step',
@@ -71,7 +166,17 @@ body { margin: 0; padding: 0; }
                     30,
                     50,
                     40,
-                    60
+                    60,
+                    50,
+                    70,
+                    60,
+                    80,
+                    70,
+                    90,
+                    80,
+                    100,
+                    90,
+                    110
                 ]
             }
         });
@@ -146,6 +251,21 @@ body { margin: 0; padding: 0; }
             map.getCanvas().style.cursor = '';
         });
     });
+
+      //show loading sign until ready to display
+        document.onreadystatechange = function () {
+        var state = document.readyState
+        if (state == 'interactive') {
+            document.getElementById('contents').style.visibility="hidden";
+        } else if (state == 'complete') {
+            setTimeout(function(){
+                document.getElementById('interactive');
+                document.getElementById('load').style.visibility="hidden";
+                document.getElementById('contents').style.visibility="visible";
+            },1000);
+        }
+        }
+
 </script>
 
 </body>
