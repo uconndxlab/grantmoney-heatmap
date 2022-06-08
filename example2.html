@@ -20,9 +20,9 @@
         <h4>Institution Type</h4>
         <select id="institution" class="dropdown" name="institution" size="1">    
           <option value="all">All</option>
-          <option value="education" >Higher Education</option>
-          <option value="business" >Business</option>
-          <option value="other" >Other</option>
+          <option value="Higher Education" >Higher Education</option>
+          <option value="Business" >Business</option>
+          <option value="Other" >Other</option>
         </select>
         </span>
         </div>
@@ -32,13 +32,13 @@
           <select id="directorate" class="dropdown" name="directorate" size="1">    
             <option value="all">All</option>
                         <option value="EHR" >Direct For Education and Human Resources</option>
-            <option value="ENG" >Directorate For Engineering</option>
-            <option value="TIP" >Dir for Tech, Innovation, & Partnerships</option>
-            <option value="BIO" >Direct For Biological Sciences</option>
-            <option value="MPS" >Direct For Mathematical & Physical Science</option>
-            <option value="SBE" >Direct For Social, Behav & Economic Science</option>
-            <option value="GEO" >Directorate For Geosciences</option>
-            <option value="CSE" >Direct For Computer & Info Scie & Enginr</option>
+            <option value="ENG">Directorate For Engineering</option>
+            <option value="TIP">Dir for Tech, Innovation, & Partnerships</option>
+            <option value="BIO">Direct For Biological Sciences</option>
+            <option value="MPS">Direct For Mathematical & Physical Science</option>
+            <option value="SBE">Direct For Social, Behav & Economic Science</option>
+            <option value="GEO">Directorate For Geosciences</option>
+            <option value="CSE">Direct For Computer & Info Scie & Enginr</option>
           </select>
         </div>
         <div>
@@ -62,6 +62,7 @@
         </div>
       </span>
     </div>
+    </div>
     </nav>
   
     <div  id="contents" class="container">
@@ -70,19 +71,24 @@
             <h2 id="resultnum">Results:</h2>
       <ul id="listresult">
       </ul>
+    </div>
       <div>
-        <div id="map"></div>
-        
+        <div id="map"></div>    
       </div>
-      </div>
-  
-      
-          
+    </div>
     </div>
 
 <script>
-    results = [];
-    listresult = document.getElementById('listresult')
+    var results = [];
+    var updatedresults = []
+    var institution = document.getElementById('institution')
+    var institutionvalue = ["Higher Education","Business","Other"]
+    var year = document.getElementById('year')
+    var yearvalue = ["2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021"]
+    var directorate = document.getElementById('directorate')
+    var directoratevalue = ["ENG","TIP","BIO","MPS","SBE","GEO","CSE"]
+    var listresult = document.getElementById('listresult')
+    
     async function getMarkers(){
         const response = await fetch("grantmoney.json");
         return await response.json();
@@ -90,22 +96,60 @@
     async function findResults(){
         results = [];
         let allResults = await this.getMarkers();
-        document.getElementById("resultnum").innerHTML="Results:" + allResults.length
         allResults.forEach(listing => {
-            var listitem = document.createElement("li")
-            var listaward = document.createElement("p")
-            listaward.innerHTML = listing.Award_Title
-            var listname = document.createElement("h4")
-            listname.innerHTML = listing.Institution_name
-            listitem.appendChild(listname)
-            listitem.appendChild(listaward)
-            listresult.appendChild(listitem)
+            results.push(listing)
+        })
+        updateResults()
+    }
+
+    function updateResults(){
+        updatedresults = []
+        listresult.innerHTML = ""
+        results.forEach(listing => {
+            if (institutionvalue.includes(listing.Institution_type) && yearvalue.includes(listing.year) && directoratevalue.includes(listing.directorateabbr)) {
+                var listitem = document.createElement("li")
+                var listaward = document.createElement("p")
+                listaward.innerHTML = listing.Award_Title
+                var listname = document.createElement("h4")
+                listname.innerHTML = listing.Institution_name
+                listitem.appendChild(listname)
+                listitem.appendChild(listaward)
+                listresult.appendChild(listitem)
+                updatedresults.push(listing)
+            }
         }
         );
+        document.getElementById("resultnum").innerHTML="Results:" + updatedresults.length
     }
 
     findResults()
 
+    //institution filter dropdown
+    institution.addEventListener('change', () => {
+    institutionvalue = [institution.value]
+    if (institution.value ==='all'){
+        institutionvalue = ["Higher Education","Business","Other"]
+    }
+    updateResults()
+    })
+
+    //year filter dropdown
+    year.addEventListener('change', () => {
+    yearvalue = [year.value]
+    if (year.value ==='all'){
+        yearvalue = ["2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021"]
+    }
+    updateResults()
+    })
+
+     //directorate filter dropdown
+    directorate.addEventListener('change', () => {
+    directoratevalue = [directorate.value]
+    if (directorate.value ==='all'){
+        directoratevalue = ["ENG","TIP","BIO","MPS","SBE","GEO","CSE"]
+    }
+    updateResults()
+    })
 
 
 	mapboxgl.accessToken = 'pk.eyJ1IjoidGhlbmF0YXR0YWNrIiwiYSI6ImNrcWIzb2xqYzA4bGcydXBvOWk5cnpvdWgifQ.EEs2Ox8pWunarciy6oAptA';
