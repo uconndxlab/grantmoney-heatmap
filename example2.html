@@ -27,11 +27,11 @@
         </span>
         </div>
         <div>
-        <span class="dropdown-directorate">
+        <span style="display: none;" class="dropdown-directorate">
           <h4>Directorate</h4>
           <select id="directorate" class="dropdown" name="directorate" size="1">    
             <option value="all">All</option>
-                        <option value="EHR" >Direct For Education and Human Resources</option>
+            <option value="EHR" >Direct For Education and Human Resources</option>
             <option value="ENG">Directorate For Engineering</option>
             <option value="TIP">Dir for Tech, Innovation, & Partnerships</option>
             <option value="BIO">Direct For Biological Sciences</option>
@@ -42,7 +42,8 @@
           </select>
         </div>
         <div>
-        </span><span class="dropdown-year">
+        </span>
+        <span class="dropdown-year">
           <h4>Year</h4>
             <select id="year" class="dropdown" name="year" size="1">    
               <option value="all">All</option>
@@ -90,7 +91,7 @@
     var listresult = document.getElementById('listresult')
     
     async function getMarkers(){
-        const response = await fetch("grantmoney.json");
+        const response = await fetch("6-9-data.json");
         return await response.json();
     }
     async function findResults(){
