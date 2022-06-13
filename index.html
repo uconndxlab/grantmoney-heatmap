@@ -13,96 +13,6 @@
    <!-- UConn Banner -->
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/uconn/banner@2.0.0/banner.css">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-  <style>
-    .header {
-      background-color: rgb(34, 34, 34);
-      box-shadow: 1px 1px 4px 0 rgb(0 0 0 / 10%);
-      position: fixed;
-      width: 100%;
-      z-index: 3;
-    }
-
-    a.footer-link {
-      color: #000 !important;
-      text-decoration: none;
-      padding:0 15px;
-    }
-
-    #mapView {
-      position:absolute;
-      top:0px;
-      width: 75%;
-      height:98vh;
-      margin-top: 0%;
-    }
-
-    #mapView canvas {
-      filter:grayscale(1);
-    }
-
-    .hidden {
-      opacity:0;
-    }
-
-    .marker-orange,
-    .marker-red,
-    .marker-green,
-    .marker-blue,
-    .marker-yellow {
-      background-size: cover;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      cursor: pointer;
-      background-color: #A4C8E1;
-      box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
-      /** transition: 0.3s; **/
-      transform-origin: center;
-    }
-
-    .marker:hover {
-        box-shadow: 0px 0px 5px 2px #A4C8E1;
-    }
-
-    .marker-red {
-      background-image: url('img/mapbox-icon-red.png')
-    }
-
-    .marker-green {
-      background-image: url('img/mapbox-icon-green-01.png')
-    }
-
-    .marker-blue {
-      background-color: #0a2a77;
-    }
-
-    .marker-blue:hover {
-        box-shadow: 0px 0px 5px 2px #0a2a77;
-    }
-
-    .marker-yellow {
-      background-image: url('img/mapbox-icon-yellow-01.png')
-    }
-
-    .emphasized {
-      height: 14px;
-      width: 14px;
-      box-shadow: 0px 0px 2px 0px rgba(111, 219, 246, 0.708);
-    }
-
-    .v-list {
-      height: 60vh;
-      /* or any height you want */
-      overflow-y: auto
-    }
-
-    .explainer-content {
-      max-height: 70vh;
-      /* or any height you want */
-      overflow-y: auto
-    }
-
-  </style>
 </head>
 
 <body>
@@ -232,7 +142,7 @@
                   <v-expansion-panel-header>
                     What am I looking at?
                   </v-expansion-panel-header>
-                  <v-expansion-panel-content id="result-description" class="explainer-content">
+                  <v-expansion-panel-content id="result-description" >
                   <h4> CT NSF Grants</h4>
                   <p>While federal, state, and corporate research grants support researchers at an institution, 
                     they also play an important role in supporting local economies in a manner that sometimes can get overlooked. </p>
@@ -422,6 +332,7 @@
       <v-footer
       fixed
       padless
+      id="footer"
     >
       <v-card
         flat

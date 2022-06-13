@@ -22,7 +22,16 @@
     margin-top: 0%;
   }
 
+  #footer{
+    display:none;
+  }
+
   @media (min-width: 960px){
+
+    #footer {
+      display:flex;
+    }
+
     #mapView {
         position:absolute;
         top:0px;
