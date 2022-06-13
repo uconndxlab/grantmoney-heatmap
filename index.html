@@ -34,6 +34,10 @@
       margin-top: 0%;
     }
 
+    #mapView canvas {
+      filter:grayscale(1);
+    }
+
     .hidden {
       opacity:0;
     }
@@ -157,43 +161,25 @@
           <v-row>
             <v-col cols="3">
 
-
-                <!-- <v-btn @click="current_type='All'; filterResultsByCurrentState();">
-                    All
-                </v-btn>
-
-                <v-btn @click="current_type='highed'; filterResultsByCurrentState();">
-                    <span style="margin-right:10px;" class="marker-blue"></span> High Ed
-                </v-btn>
-                  <v-btn @click="current_type='city'; filterResultsByCurrentState();">
-                    <span style="margin-right:10px;" class="marker-orange"></span> Cities
-                  </v-btn> -->
-
-              <!-- <v-tabs v-model="resultsTab">
-                <v-tabs-slider></v-tabs-slider>
-                <v-tab @click="" >
-                  All
-                </v-tab>
-                <v-tab @click="filterResultsByType('highed');">
-                  <span style="margin-right:10px;" class="marker-blue"></span> High Ed
-                </v-tab>
-                <v-tab @click="filterResultsByType('city');">
-                  <span style="margin-right:10px;" class="marker-orange"></span> Cities
-                </v-tab>
-              </v-tabs> -->
-
-                        <v-select
-                                v-model="current_type"
-                                :items="ins_types"
-                                @change="filterResultsByCurrentState()"
-                                height=50
-                                chips
-                                label="Institution Type"
-                        ></v-select>
-                        
-                            <v-select :items="years" chips label="Year"  height=50
-                            v-model="current_year" @change="filterResultsByCurrentState()">
-                            </v-select>               
+              <v-expansion-panels multiple accordion :value="panel">
+                <v-expansion-panel :key="0">
+                  <v-expansion-panel-header>
+                    Filters
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <v-select
+                            v-model="current_type"
+                            :items="ins_types"
+                            @change="filterResultsByCurrentState()"
+                            height=50
+                            chips
+                            dense
+                            label="Institution Type"
+                    ></v-select>
+                    
+                    <v-select :items="years" chips label="Year"  height=50 dense
+                    v-model="current_year" @change="filterResultsByCurrentState()">
+                    </v-select>               
                           
                     <v-list>
                         <v-list-item-group>
@@ -217,6 +203,36 @@
                           </v-list-item>
                         </v-list-item-group>
                       </v-list>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+
+                <v-expansion-panel :key="1">
+                  <v-expansion-panel-header>
+                    What Am I Looking At?
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                  <h4> CT NSF Grants</h4>
+                  <p>While federal, state, and corporate research grants support researchers at an institution, 
+                    they also play an important role in supporting local economies in a manner that sometimes can get overlooked. </p>
+                    <p>Here we are showing a visualization of all NSF grants obtained by businesses and higher education institutions within the State of Connecticut between the 2017 and 2022 fiscal years distributed by municipality. 
+                    Circle sizes are proportional to the dollar value of grants obtained. 
+                    Feel free to explore the visualization by adjusting filters or just panning and zooming on the map. 
+                    If you have questions feel free to reach out to us!
+                    </p>
+      
+                    <h4> Jobs Data</h4>
+                    <p>The operational expenditures of businesses and institutions receiving NSF grants have both direct and indirect economic effects on jobs within the state of Connecticut. 
+                    The direct effects are the jobs that are supported as a result of the initial injections of spending into the state economy. </p>
+                    <p>These consist of total personnel costs and other contractual or commodity expenses. 
+                    This spending generates two spillover effects: indirect and induced. Indirect effects include jobs supported as a result of local businesses spending on goods and services purchased by institutions receiving NSF grants; these businesses use payments from NSF grant awardees for supplies, employee salaries, and so on, creating a cycle of spending that impacts the state economy. 
+                    Induced effects include additional jobs supported as a result of household spending generated by business activities that are directly or indirectly supported by the NSF grant. 
+                    The total number of jobs is therefore the combination of direct, indirect and induced effects. </p>
+                  </v-expansion-panel-content>
+                  </v-expansion-panel>                
+              </v-expansion-panels>
+
+
+
 
 
 
@@ -225,7 +241,7 @@
             <v-col cols="9">
 
               <div id="mapView"></div>
-              <v-btn
+              <!-- <v-btn
               color="primary"
               dark
               absolute
@@ -235,7 +251,7 @@
               @click = "showInfoPane = true;"
             >
               <v-icon>mdi-information</v-icon>
-            </v-btn>
+            </v-btn> -->
             </v-col>
           </v-row>
         </v-container>
@@ -396,7 +412,7 @@
         <v-card-text>
             <v-row>
             <v-col>
-              <a class="footer-link" href="https://uconn.edu/">© University of Connecticut</a>
+              <a class="footer-link" href="https://uconn.edu/">&copy; University of Connecticut</a>
               <a class="footer-link" href="https://uconn.edu/disclaimers-privacy-copyright/">Disclaimers, Privacy &amp; Copyright</a>
               <a class="footer-link" href="https://accessibility.uconn.edu/">Accessibility</a>
             </v-col>
@@ -423,6 +439,7 @@
         map: "",
         jobs_max: 350,
         max_award_amount: 40000000,
+        panel:[1],
         current_year: 'All',
         cities: [],
         current_type: "All",
