@@ -8,6 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+  <!-- Add CSS -->
+  <link rel="stylesheet" href="css/index.css">
    <!-- UConn Banner -->
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/uconn/banner@2.0.0/banner.css">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -126,6 +128,20 @@
         </div>
       </div>
 
+    <nav class="upper-nav">
+        <div class="">
+          <a class="parent-title" href="https://core.uconn.edu/news">Center For Open Research Resources and Equipment</a>
+        </div>
+    
+    </nav>
+    <nav class="navbar navbar-expand-lg navbar-light shift">
+        <div class="">
+          <a class="navbar-brand" href="index.html">Connecticut's NSF Grants</a>
+        </div>
+    
+     </nav>
+  
+
     <v-app>
         
       <v-main>
@@ -164,8 +180,8 @@
         </v-app-bar> -->
 
         <v-container fluid>
-          <v-row>
-            <v-col cols="3">
+          <v-row class="d-block d-md-flex">
+            <v-col cols="12"  md="3">
 
               <v-expansion-panels multiple accordion :value="panel">
                 <v-expansion-panel :key="0">
@@ -187,7 +203,7 @@
                     v-model="current_year" @change="filterResultsByCurrentState()">
                     </v-select>               
                           
-                    <v-list>
+                    <v-list id="result-list">
                         <v-list-item-group>
                           <v-list-item v-for="ins in activeResults" :key="ins.Institution_Name" @click="doActivate(ins)">
                             
@@ -216,7 +232,7 @@
                   <v-expansion-panel-header>
                     What am I looking at?
                   </v-expansion-panel-header>
-                  <v-expansion-panel-content class="explainer-content">
+                  <v-expansion-panel-content id="result-description" class="explainer-content">
                   <h4> CT NSF Grants</h4>
                   <p>While federal, state, and corporate research grants support researchers at an institution, 
                     they also play an important role in supporting local economies in a manner that sometimes can get overlooked. </p>
@@ -244,7 +260,7 @@
 
 
             </v-col>
-            <v-col cols="9">
+            <v-col cols="12" md="9">
 
               <div id="mapView"></div>
               <!-- <v-btn
@@ -681,6 +697,21 @@
 
         },
 
+        calculateMarkerOpacity(val) {
+            let max = this.jobs_max;
+            let percentage = val/max;
+                percentage = percentage*100
+
+            if(percentage+50  < 60){
+                return 60;
+            }
+            if (percentage+50 > 100) {
+                return 100;
+            }
+            else return percentage+50;
+
+        },
+
         placeMarkers() {
           this.clearMarkers();
           var that = this;
@@ -696,12 +727,16 @@
 
             if(that.current_year == "All") {
                 let width = this.calculateMarkerDiameter(inst.total_award);
+                let opacity = this.calculateMarkerOpacity(inst.total_jobs);
                 el.style.width = `${width}px`;
                 el.style.height = `${width}px`;
+                el.style.opacity = `${opacity}%`;
             } else {
                 let width = this.calculateMarkerDiameter(inst['Award_Amount_'+that.current_year]);
+                let opacity = this.calculateMarkerOpacity(inst.total_jobs);
                 el.style.width = `${width}px`;
                 el.style.height = `${width}px`;
+                el.style.opacity = `${opacity}%`;
             }
 
 
