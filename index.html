@@ -1,203 +1,852 @@
-<!doctype html>
-<html class="no-js" lang="">
+<!DOCTYPE html>
+<html>
 
 <head>
-  <meta charset="utf-8">
-  <title>LID Atlas</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="manifest" href="site.webmanifest">
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <title>Connecticut's NSF Grants</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+   <!-- UConn Banner -->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/uconn/banner@2.0.0/banner.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <style>
+    .header {
+      background-color: rgb(34, 34, 34);
+      box-shadow: 1px 1px 4px 0 rgb(0 0 0 / 10%);
+      position: fixed;
+      width: 100%;
+      z-index: 3;
+    }
 
+    #mapView {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: 75%;
+      height: auto;
+      margin-top: 0%;
+    }
 
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="https://use.typekit.net/baj5duk.css">
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet' />
+    .hidden {
+        opacity:0;
+    }
 
-  <meta name="theme-color" content="#fafafa">
+    .marker-orange,
+    .marker-red,
+    .marker-green,
+    .marker-blue,
+    .marker-yellow {
+      background-size: cover;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      cursor: pointer;
+      background-color: #A4C8E1;
+      box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.5);
+      transition: 0.3s;
+      transform-origin: center;
+    }
+
+    .marker:hover {
+        box-shadow: 0px 0px 5px 2px #A4C8E1;
+    }
+
+    .marker-red {
+      background-image: url('img/mapbox-icon-red.png')
+    }
+
+    .marker-green {
+      background-image: url('img/mapbox-icon-green-01.png')
+    }
+
+    .marker-blue {
+      background-color: #0a2a77;
+    }
+
+    .marker-blue:hover {
+        box-shadow: 0px 0px 5px 2px #0a2a77;
+    }
+
+    .marker-yellow {
+      background-image: url('img/mapbox-icon-yellow-01.png')
+    }
+
+    .emphasized {
+      height: 14px;
+      width: 14px;
+      box-shadow: 0px 0px 2px 0px rgba(111, 219, 246, 0.708);
+    }
+
+    .v-list {
+      height: 70vh;
+      /* or any height you want */
+      overflow-y: auto
+    }
+
+  </style>
 </head>
 
 <body>
-  <div id="load"></div>
-  <nav class="header">
-    <div class="container" id="nav">
-    <a href="index.html" class="logo">Grant Money Distribution</a>
-  </nav>
+    
+  <div id="app">
+    <div id="uconn-banner">
 
-
-  
-  <div  id="contents" class="container">
-      <div class="content">
-      <div class="map-filters">
-        <!--<div class="row">
-          <div class="col">
-              <input class="form-control" id="search" type="text" placeholder="Search..."/>
+        <div id="uconn-header-container">
+    
+          <div class="row-container">
+            <div class="row-fluid">
+              <div id="home-link-container">
+                <a id="home-link" href="https://uconn.edu/">
+                  <span id="wordmark" aria-hidden="true">UConn</span>
+                  <span id="university-of-connecticut" style="text-transform: uppercase;">
+                    University of Connecticut
+                  </span>
+                </a>
+              </div>
+    
+            </div>
           </div>
-      </div>-->
-      <span class="dropdown-institution">
-        <h3>Institution Type</h3>
-        <select id="institution" class="dropdown" name="institution" size="1">    
-          <option value="all">All</option>
-          <option value="education" >Higher Education</option>
-          <option value="business" >Business</option>
-          <option value="other" >Other</option>
-        </select>
-        <span class="dropdown-directorate">
-          <h3>Directorate</h3>
-          <select id="directorate" class="dropdown" name="directorate" size="1">    
-            <option value="all">All</option>
-						<option value="EHR" >Direct For Education and Human Resources</option>
-            <option value="ENG" >Directorate For Engineering</option>
-            <option value="TIP" >Dir for Tech, Innovation, & Partnerships</option>
-            <option value="BIO" >Direct For Biological Sciences</option>
-            <option value="MPS" >Direct For Mathematical & Physical Science</option>
-            <option value="SBE" >Direct For Social, Behav & Economic Science</option>
-            <option value="GEO" >Directorate For Geosciences</option>
-            <option value="CSE" >Direct For Computer & Info Scie & Enginr</option>
-          </select>
-        </span><span class="dropdown-year">
-          <h3>Year</h3>
-            <select id="year" class="dropdown" name="year" size="1">    
-              <option value="all">All</option>
-              <option value="AL" >2013</option>
-              <option value="AK" >2014</option>
-              <option value="AZ" >2015</option>
-            </select>  
-        </span>
-      </span>
-    <h3>Legend:</h3>
-    <div class="legend"><div class="square blue"></div><p>Higher Education</p></div>
-    <div class="legend"><div class="square red"></div><p>Business</p></div>
-    <div class="legend"><div class="square yellow"></div><p>Other</p></div>
-    <!--<button id="list-map-btn">Show List</button>
-  </div>
-  <div id="list">
-    <h3 style="margin-top: 0"></h3>
-    <ul id="gathered_info"></ul>
-  </div>-->
-    <div>
-      <div id="mapView"></div>
-      
-    </div>
-    </div>
+        </div>
+      </div>
 
-    
+    <v-app>
         
+      <v-main>
+        <!-- <v-app-bar color="#182A60" dark app prominent>
+          <v-container fluid class="header-container">
+
+
+            
+            <v-row style="margin-top:5px">
+
+              <v-col style="padding-top:25px;">
+                <v-toolbar-title>Connecticut's NSF Grants</v-toolbar-title>
+
+            </v-col>
+
+            <v-col
+                
+            >
+            <v-select
+                    v-model="current_type"
+                    :items="ins_types"
+                    @change="filterResultsByCurrentState()"
+                    
+                    chips
+                    label="Institution Type"
+                    dense
+            ></v-select>
+            </v-col>
+
+              <v-col >
+                <v-select :items="years"  chips label="Year" v-model="current_year" @change="filterResultsByCurrentState()" dense>
+                </v-select>               
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-app-bar> -->
+
+        <v-container fluid>
+          <v-row>
+            <v-col cols="3">
+
+
+                <!-- <v-btn @click="current_type='All'; filterResultsByCurrentState();">
+                    All
+                </v-btn>
+
+                <v-btn @click="current_type='highed'; filterResultsByCurrentState();">
+                    <span style="margin-right:10px;" class="marker-blue"></span> High Ed
+                </v-btn>
+                  <v-btn @click="current_type='city'; filterResultsByCurrentState();">
+                    <span style="margin-right:10px;" class="marker-orange"></span> Cities
+                  </v-btn> -->
+
+              <!-- <v-tabs v-model="resultsTab">
+                <v-tabs-slider></v-tabs-slider>
+                <v-tab @click="" >
+                  All
+                </v-tab>
+                <v-tab @click="filterResultsByType('highed');">
+                  <span style="margin-right:10px;" class="marker-blue"></span> High Ed
+                </v-tab>
+                <v-tab @click="filterResultsByType('city');">
+                  <span style="margin-right:10px;" class="marker-orange"></span> Cities
+                </v-tab>
+              </v-tabs> -->
+
+                        <v-select
+                                v-model="current_type"
+                                :items="ins_types"
+                                @change="filterResultsByCurrentState()"
+                                height=50
+                                chips
+                                label="Institution Type"
+                        ></v-select>
+                        
+                            <v-select :items="years" chips label="Year"  height=50
+                            v-model="current_year" @change="filterResultsByCurrentState()">
+                            </v-select>               
+                          
+                    <v-list>
+                        <v-list-item-group>
+                          <v-list-item v-for="ins in activeResults" :key="ins.Institution_Name" @click="doActivate(ins)">
+                            
+                            <v-list-item-icon v-if="ins.type == 'City'">
+                                <span class="marker-orange"></span>                            
+                            </v-list-item-icon>
+                            <v-list-item-icon v-if="ins.type == 'Higher Ed Institution'">
+                                <span class="marker-blue"></span>                            
+                            </v-list-item-icon>                            
+                            <v-list-item-content>
+                              <v-list-item-title>{{ins.Institution_Name}}</v-list-item-title>
+                              <span v-if="current_year !== 'All'"><strong>{{current_year}}: </strong>{{ins['Award_Amount_' + current_year] | toUSD}} </span>
+                              <span v-if="current_year == 'All'"><strong>Total Awards (2011-2022) </strong>{{ins['total_award'] | toUSD}} </span>
+
+                              <span v-if="current_year !== 'All'"><strong>{{current_year}} Jobs: </strong>{{ins['jobs_' + current_year]}} </span>
+                              <span v-if="current_year == 'All'"><strong> Total Jobs (2011-2022) </strong>{{ins['total_jobs']}} </span>
+
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list-item-group>
+                      </v-list>
+
+
+
+
+            </v-col>
+            <v-col cols="9">
+
+              <div id="mapView"></div>
+            </v-col>
+          </v-row>
+        </v-container>
+
+<v-dialog
+      v-model="showActiveInst"
+      scrollable
+      max-width="600px"
+    >
+    <v-card>
+        <v-card-title>{{activeInst.Institution_Name}}</v-card-title>
+        <v-divider></v-divider>
+        <v-card-text style="height: 300px;">
+            <v-simple-table>
+                <template v-slot:default>
+            <thead>
+                <tr>
+                  <th class="text-left">
+                    Year
+                  </th>
+                  <th class="text-left">
+                    Award
+                  </th>
+
+                  <th class="text-left">
+                    # Jobs
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+
+                  <td>Total</td>
+                  <td>{{activeInst.total_award  | toUSD }}</td>
+                  <td>{{activeInst.total_jobs }}</td>                
+
+                </tr>
+
+                <tr>
+                    <td>2011</td>
+                    <td>{{activeInst.Award_Amount_2011 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2011 }}</td>  
+                </tr>
+
+                <tr>
+                    <td>2012</td>
+                    <td>{{activeInst.Award_Amount_2012 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2012 }}</td>  
+                </tr>
+                <tr>
+                    <td>2013</td>
+                    <td>{{activeInst.Award_Amount_2013 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2013 }}</td>  
+                </tr>
+                <tr>
+                    <td>2014</td>
+                    <td>{{activeInst.Award_Amount_2014 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2014 }}</td>  
+                </tr>
+                <tr>
+                    <td>2015</td>
+                    <td>{{activeInst.Award_Amount_2015 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2015 }}</td>  
+                </tr>
+                <tr>
+                    <td>2016</td>
+                    <td>{{activeInst.Award_Amount_2016 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2016 }}</td>  
+                </tr>
+                <tr>
+                    <td>2017</td>
+                    <td>{{activeInst.Award_Amount_2017 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2017 }}</td>  
+                </tr>
+                
+                <tr>
+                    <td>2018</td>
+                    <td>{{activeInst.Award_Amount_2018 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2018 }}</td>  
+                </tr>
+                <tr>
+                    <td>2019</td>
+                    <td>{{activeInst.Award_Amount_2019 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2019 }}</td>  
+                </tr>
+                <tr>
+                    <td>2020</td>
+                    <td>{{activeInst.Award_Amount_2020 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2020 }}</td>  
+                </tr>
+                <tr>
+                    <td>2021</td>
+                    <td>{{activeInst.Award_Amount_2021 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2021 }}</td>  
+                </tr>
+                <tr>
+                    <td>2022</td>
+                    <td>{{activeInst.Award_Amount_2022 | toUSD}}</td>
+                    <td>{{activeInst.jobs_2022 }}</td>  
+                </tr>
+
+
+
+
+
+
+
+
+
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-card-text>
+        </v-card>
+</v-dialog>
+
+
+
+      </v-main>
+    </v-app>
   </div>
-  
 
-  
-  <!--[if IE]>
-    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]-->
-
-  <!-- Add your site or application content here -->
-  <script src="js/vendor/modernizr-3.8.0.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-  <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
-  <script src="js/plugins.js"></script>
-  <script src="js/main.js"></script>
-  
-
-  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
   <script>
-    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
-    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set','transport','beacon'); ga('send', 'pageview')
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data: () => ({
+        map: "",
+        jobs_max: 350,
+        max_award_amount: 40000000,
+        current_year: 'All',
+        cities: [],
+        current_type: "All",
+        highEd: [],
+        shownCityMarkers: [],
+        shownHighEdMarkers: [],
+        shownMarkers: [],
+        resultsTab: 0,
+        activeInst: {},
+        showActiveInst:false,
+        ins_types: [
+          "All",
+          "City",
+          "Higher Ed Institution"
+        ],
+        years: [
+          'All', 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022
+        ],
+
+        combinedResults:[]
+      }),
+      computed:{
+        activeResults() {
+            var arr = this.combinedResults.filter(i => i.active == true);
+            
+            var sorted = arr.sort((a, b) => (a.total_award < b.total_award) ? 1 : -1)
+
+
+            // inst_year_award =  inst_year_award.replace(/,/g, '');
+            // inst_year_award = parseInt(inst_year_award);
+
+
+
+            if(this.current_year !== "All")
+                var sorted = arr.sort((a, b) => (parseInt(a['Award_Amount_' +this.current_year]) < parseInt(b['Award_Amount_'+this.current_year])) ? 1 : -1)
+
+
+            return arr;
+
+        }
+      },
+      mounted() {
+        mapboxgl.accessToken =
+          'pk.eyJ1Ijoiam9lbHVjb25uIiwiYSI6ImNrc3VtNDBndTFod3MybnFrbDRxN2EybHYifQ.2_iHqtCV_x6T78U4JD293g';
+        const map = new mapboxgl.Map({
+          container: 'mapView',
+          style: 'mapbox://styles/mapbox/streets-v11',
+          center: [-72.7, 41.45],
+          zoom: 8.5
+        });
+
+        this.map = map;
+
+        this.getCities();
+        this.getHighEd();
+
+      },
+
+      filters: {
+        toUSD (value) {
+        return `$${value.toLocaleString()}`
+        }
+    },
+
+      methods: {
+        getCities() {
+          let that = this;
+          fetch('cities.json')
+            .then(response => response.json())
+            .then(function (data) {
+
+              data.forEach(function (ins) {
+                ins.total_award = 0;
+                ins.total_jobs = 0;
+                ins.type="City";
+                ins.active= true;
+                that.combinedResults.push(ins);
+                that.cities.push(ins);
+                console.log("this institution..." + ins.Institution_Name);
+                
+                that.years.forEach(function(year){
+                    if (year !== "All") {
+                        var year = year.toString();
+                        var inst_year_award = ins['Award_Amount_' + year]
+                        var inst_year_jobs = ins['jobs_' + year];
+
+                        if(inst_year_award != "-") {
+                            inst_year_award =  inst_year_award.replace(/,/g, '');
+                            inst_year_award = parseInt(inst_year_award);
+                            ins['Award_Amount_' + year] = inst_year_award;
+
+                            console.log("this year..." + year + "..." + inst_year_award);
+
+                            ins.total_award += parseInt(inst_year_award);
+                            console.log("...and a total of .... " +ins.total_award);
+                        } else {
+                            ins['Award_Amount_' + year] = 0;
+                        }
+
+
+                        if(inst_year_jobs != "-") {
+                            
+                            inst_year_jobs = parseInt(inst_year_jobs);
+
+                            ins.total_jobs += parseInt(inst_year_jobs);
+                        } else {
+                            ins['jobs_' + year] = 0;
+                        }
+                    }
+
+                })
+
+                
+
+              })
+              that.placeMarkers()
+            })
+
+
+
+        },
+
+        getHighEd() {
+          let that = this;
+          fetch('high-ed.json')
+            .then(response => response.json())
+            .then(function (data) {
+              data.forEach(function (ins) {
+                ins.total_award = 0;
+                ins.total_jobs = 0;
+                ins.type = "Higher Ed Institution";
+                ins.active= true;
+                that.combinedResults.push(ins);
+                that.highEd.push(ins);
+
+                console.log("this institution..." + ins.Institution_Name);
+                
+                that.years.forEach(function(year){
+                    if (year !== "All") {
+                        var year = year.toString();
+                        var inst_year_award = ins['Award_Amount_' + year]
+                        var inst_year_jobs = ins['jobs_' + year];
+
+                        if(inst_year_award != "-") {
+                            inst_year_award =  inst_year_award.replace(/,/g, '');
+                            inst_year_award = parseInt(inst_year_award);
+                            ins['Award_Amount_' + year] = inst_year_award;
+
+                            console.log("this year..." + year + "..." + inst_year_award);
+
+                            ins.total_award += parseInt(inst_year_award);
+                            console.log("...and a total of .... " +ins.total_award);
+                        } else {
+                            ins['Award_Amount_' + year] = 0;
+                        }
+
+
+                        if(inst_year_jobs != "-") {
+                            
+                            inst_year_jobs = parseInt(inst_year_jobs);
+
+                            ins.total_jobs += parseInt(inst_year_jobs);
+                        } else {
+                            ins['jobs_' + year] = 0;
+                        }
+                    }
+
+                })
+
+
+
+              })
+              that.placeMarkers()
+            })
+        },
+
+        filterResultsByCurrentState() {
+            var type = this.current_type;
+            var year = this.current_year;
+
+            
+            this.combinedResults.forEach(function(item){
+                var award_year_amount = item['Award_Amount_'+year];
+                
+                if ((item.type == type) && (award_year_amount != "-")) {
+                    item.active = true;
+                } else {
+                    item.active = false;
+                }
+
+                if((type=="All") && (award_year_amount != "-")){
+                    item.active = true;
+                }
+
+            });
+
+            console.log(this.activeResults);
+            this.placeMarkers();
+        },
+
+        // filterResultsByYear() {
+        //     var year = this.current_year;
+        //     console.log("filter results by year");
+        //     console.log(year);
+
+        //     this.combinedResults.forEach(function(item){
+        //         if(item['Award_Amount_'+year] != "-") {
+        //             item.active = true
+        //         } else {
+        //             item.active = false;
+        //     });
+        //     this.placeMarkers();
+        // },
+
+        calculateMarkerDiameter(val) {
+            let max = this.max_award_amount;
+            let percentage = val/max;
+                percentage = percentage*100
+
+            if(percentage  < 15)
+                return 15;
+            if (percentage > 50) {
+                return 50;
+            }
+            else return percentage;
+
+        },
+
+        placeMarkers() {
+          this.clearMarkers();
+          var that = this;
+          var data = that.activeResults;
+          for (var i = 0; i < data.length; i++) {
+            let inst = data[i];
+
+
+            var el = document.createElement('div');
+            el.classList.add('marker');
+
+            el.setAttribute('title', inst.Institution_Name);
+
+            if(that.current_year == "All") {
+                let width = this.calculateMarkerDiameter(inst.total_award);
+                el.style.width = `${width}px`;
+                el.style.height = `${width}px`;
+            } else {
+                let width = this.calculateMarkerDiameter(inst['Award_Amount_'+that.current_year]);
+                el.style.width = `${width}px`;
+                el.style.height = `${width}px`;
+            }
+
+
+            switch (inst.type) {
+                case 'Higher Ed Institution':
+                    el.classList.add ("marker-blue");
+                    el.classList.add ("marker-high-ed");
+                break;
+
+                default:
+                    el.classList.add ("marker-orange");
+                    el.classList.add ("marker-high-city");
+                break;
+            }
+
+            el.addEventListener('click', function(){that.doActivate(inst)});
+            
+            
+            // that.years.forEach(function(yr){
+            //         var year = yr.toString();
+            //         var inst_year_award = inst['Award_Amount_' + year]
+            //         var inst_year_jobs = inst['jobs_' + year];
+                 
+            //         if ( inst_year_award !== "-") {
+            //             var key = 'award-amount-'+ year;
+            //             el.setAttribute('data-' + key, inst_year_award);
+
+
+            //             console.log("Dollars that year " + inst_year_award);
+
+            //             var diameter = parseFloat(parseInt(inst_year_award) / parseInt(that.max_award_amount)) ;
+            //             //console.log("diameter: " +  diameter);
+
+
+
+            //         }
+
+            //         if ( inst_year_jobs !== "-") {
+            //             var key = 'jobs-'+ year;
+            //             el.setAttribute('data-' + key, inst_year_jobs);
+            //         }
+            // });
+
+
+
+                var mrk = new mapboxgl.Marker(el)
+                .setLngLat([inst.x, inst.y])
+                .addTo(that.map);
+
+                this.shownMarkers.push(mrk);
+
+
+            }
+        },
+
+        doActivate(inst){
+            console.log(inst.Institution_Name);
+            this.showActiveInst = true;
+
+            this.activeInst = inst;
+        },
+
+        placeHighEdMarkers() {
+          var that = this;
+          var data = this.highEd;
+          for (var i = 0; i < data.length; i++) {
+            var inst = data[i];
+
+
+            var el = document.createElement('div');
+            el.classList.add('marker');
+            el.classList.add ("marker-blue");
+            el.classList.add ("marker-high-ed");
+            
+            that.years.forEach(function(yr){
+                    var year = yr.toString();
+                    var inst_year_award = inst['Award_Amount_' + year]
+                    var inst_year_jobs = inst['jobs_' + year];
+                 
+                    if ( inst_year_award !== "-") {
+                        var key = 'award-amount-'+ year;
+                        el.setAttribute('data-' + key, inst_year_award);
+                    }
+
+                    if ( inst_year_jobs !== "-") {
+                        var key = 'jobs-'+ year;
+                        el.setAttribute('data-' + key, inst_year_jobs);
+                    }
+            });
+
+
+
+
+
+
+
+
+
+
+
+            var mrk = new mapboxgl.Marker(el)
+              .setLngLat([inst.x, inst.y])
+              .addTo(that.map);
+
+            this.shownHighEdMarkers.push(mrk);
+          }
+        },
+
+        placeCityMarkers() {
+          var that = this;
+          var data = this.cities;
+          for (var i = 0; i < data.length; i++) {
+            var inst = data[i];
+
+            var el = document.createElement('div');
+            el.classList.add('marker');
+            el.classList.add("marker-orange");
+            el.classList.add("marker-city");
+
+            that.years.forEach(function(yr){
+                    var year = yr.toString();
+                    var inst_year_award = inst['Award_Amount_' + year]
+                    var inst_year_jobs = inst['jobs_' + year];
+                 
+                    if ( inst_year_award !== "-") {
+                        var key = 'award-amount-'+ year;
+                        el.setAttribute('data-' + key, inst_year_award);
+                    }
+
+                    if ( inst_year_jobs !== "-") {
+                        var key = 'jobs-'+ year;
+                        el.setAttribute('data-' + key, inst_year_jobs);
+                    }
+            });
+
+            var mrk = new mapboxgl.Marker(el)
+              .setLngLat([inst.x, inst.y])
+              .addTo(that.map);
+
+            this.shownCityMarkers.push(mrk);
+          }
+
+        },
+
+        emphasize(selector) {
+          var items = document.querySelectorAll(selector);
+          items.forEach(function (item) {
+            item.classList.remove('hidden');
+          })
+        },
+
+        hide(selector){
+            var items = document.querySelectorAll(selector);
+            items.forEach(function (item) {
+                item.classList.add('hidden');
+            })
+        },
+
+        show(selector) {
+            var items = document.querySelectorAll(selector);
+            items.forEach(function (item) {
+                item.classList.remove('hidden');
+            })
+        },
+
+        deEmphasize(selector) {
+          var items = document.querySelectorAll(selector);
+          items.forEach(function (item) {
+            item.classList.remove('emphasized');
+            item.classList.add('hidden');
+          })
+        },
+
+        clearMarkers() {
+
+            var markers = this.shownMarkers;
+            markers.forEach(function (marker) {
+                marker.remove();
+            })
+
+        },
+
+        clearCityMarkers() {
+
+          var markers = this.shownCityMarkers;
+          markers.forEach(function (marker) {
+            marker.remove();
+          })
+
+        },
+
+        clearHighEdMarkers() {
+          var markers = this.shownHighEdMarkers;
+          markers.forEach(function (marker) {
+            marker.remove();
+          })
+        },
+
+        placeMarkersAgain() {
+        //   this.placeCityMarkers();
+        //   this.placeHighEdMarkers();
+        },
+
+        changeYear() {
+
+            this.filterResultsOnKey('')
+
+            // let that = this;
+            // this.placeMarkersAgain();
+            // var markers = document.querySelectorAll('.marker');                
+
+            // markers.forEach(function(marker){
+            //     if(that.current_year !== "All") {
+            //         marker.classList.add('hidden');
+            //         var key = marker.dataset["awardAmount-" + that.current_year]
+                    
+            //         if(key != undefined) {
+            //             marker.classList.remove('hidden');
+            //         }
+            //     } else {
+            //         marker.classList.remove('hidden');
+            //     }
+                
+            // });
+        },
+
+        changeInst_Type() {
+          switch (this.inst_type) {
+            case "Higher Ed Institution":
+              this.hide('.marker-city');
+              this.show('.marker-high-ed')
+              break;
+
+            case "City":
+                this.hide('.marker-high-ed');
+                this.show('.marker-city')
+              break;
+          }
+        }
+      }
+    })
+
   </script>
-  <script src="https://www.google-analytics.com/analytics.js" async></script>
 
-
-  <script>
-  mapboxgl.accessToken = 'pk.eyJ1IjoidGhlbmF0YXR0YWNrIiwiYSI6ImNrcWIzb2xqYzA4bGcydXBvOWk5cnpvdWgifQ.EEs2Ox8pWunarciy6oAptA';
-
-
-let map = new mapboxgl.Map({
-container: 'mapView',
-style: 'mapbox://styles/mapbox/streets-v11',
-center: [-72.7, 41.6],
-zoom: 8
-});
-
-
-
-//clear current map, get data, put data into array, map data
-
-var currentMarkers=[]
-
-async function getData(){
-  if (currentMarkers!=null){
-    for (var i = currentMarkers.length - 1; i >= 0; i--){
-      currentMarkers[i].remove();
-    }
-  }
-  const response = await fetch("grantmoney.json")
-  var data = await response.json()
-  for (i in data){
-    var el = document.createElement('div');
-    
-    if (data[i].Institution_type === "Higher Education"){
-      el.className = 'marker-blue';
-    }
-    else if (data[i].Institution_type === "Business"){
-      el.className = 'marker-red';
-    }
-    else if (data[i].Institution_type === "Other"){
-      el.className = 'marker-yellow';
-    }
-    var marker = new mapboxgl.Marker(el)
-    .setLngLat([data[i].longitude, data[i].latitude])
-    .setPopup(
-    new mapboxgl.Popup({ offset: 25 }) // add popups
-    .setHTML(
-    '<h3>' +
-    data[i].Institution_name +
-    '</h3><p>' +
-    data[i].Award_Title +
-    '</p>'
-    )
-    )
-    .addTo(map);
-   currentMarkers.push(marker)
-  }
-  
-}
-
-var projects = []
-var statevalue = ""
-
-var state = document.getElementById('institution')
-
-//state filter dropdown
-state.addEventListener('change', () => {
-  statevalue = '&state='+state.value
-  if (state.value==='all'){
-    statevalue = ""
-  }
-  getData()
-})
-
-  //show loading sign until ready to display
-  document.onreadystatechange = function () {
-  var state = document.readyState
-  if (state == 'interactive') {
-       document.getElementById('contents').style.visibility="hidden";
-  } else if (state == 'complete') {
-      setTimeout(function(){
-         document.getElementById('interactive');
-         document.getElementById('load').style.visibility="hidden";
-         document.getElementById('contents').style.visibility="visible";
-      },1000);
-  }
-}
-
-  getData()
-
-  </script>
 
 </body>
 
 </html>
-
