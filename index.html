@@ -113,7 +113,7 @@
                     v-model="current_year" @change="filterResultsByCurrentState()">
                     </v-select>               
                           
-                    <v-list>
+                    <v-list id="result-list">
                         <v-list-item-group>
                           <v-list-item v-for="ins in activeResults" :key="ins.Institution_Name" @click="doActivate(ins)">
                             
@@ -142,7 +142,7 @@
                   <v-expansion-panel-header>
                     What Am I Looking At?
                   </v-expansion-panel-header>
-                  <v-expansion-panel-content id="description">
+                  <v-expansion-panel-content id="result-description">
                   <h4> CT NSF Grants</h4>
                   <p>While federal, state, and corporate research grants support researchers at an institution, 
                     they also play an important role in supporting local economies in a manner that sometimes can get overlooked. </p>
@@ -607,6 +607,20 @@
 
         },
 
+        calculateMarkerOpacity(val) {
+            let max = this.jobs_max;
+            let percentage = val/max;
+                percentage = percentage*100
+
+            if(percentage  < 15)
+                return 70;
+            if (percentage > 50) {
+                return 98;
+            }
+            else return percentage;
+
+        },
+
         placeMarkers() {
           this.clearMarkers();
           var that = this;
@@ -622,12 +636,16 @@
 
             if(that.current_year == "All") {
                 let width = this.calculateMarkerDiameter(inst.total_award);
+                let opacity = this.calculateMarkerOpacity(inst.total_jobs);
                 el.style.width = `${width}px`;
                 el.style.height = `${width}px`;
+                el.style.opacity = `${opacity}%`;
             } else {
                 let width = this.calculateMarkerDiameter(inst['Award_Amount_'+that.current_year]);
+                let opacity = this.calculateMarkerOpacity(inst.total_jobs);
                 el.style.width = `${width}px`;
                 el.style.height = `${width}px`;
+                el.style.opacity = `${opacity}%`;
             }
 
 
