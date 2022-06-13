@@ -612,12 +612,13 @@
             let percentage = val/max;
                 percentage = percentage*100
 
-            if(percentage  < 15)
-                return 70;
-            if (percentage > 50) {
-                return 98;
+            if(percentage+50  < 60){
+                return 60;
             }
-            else return percentage;
+            if (percentage+50 > 100) {
+                return 100;
+            }
+            else return percentage+50;
 
         },
 
