@@ -221,9 +221,43 @@
             <v-col cols="9">
 
               <div id="mapView"></div>
+              <v-btn
+              color="primary"
+              dark
+              absolute
+              top
+              right
+              fab
+              @click = "showInfoPane = true;"
+            >
+              <v-icon>mdi-information</v-icon>
+            </v-btn>
             </v-col>
           </v-row>
         </v-container>
+
+
+      <v-dialog
+        v-model="showInfoPane"
+        scrollable
+        max-width="600px"
+      >
+      <v-card>
+          <v-card-title>Connecticut NSF Grants</v-card-title>
+          <v-divider></v-divider>
+          <v-card-text style="padding-top:20px; height: 300px;">
+            <p>While federal, state, and corporate research grants support researchers at an institution, 
+              they also play an important role in supporting local economies in a manner that sometimes can get overlooked. </p>
+              <p>Here we are showing a visualization of all NSF grants obtained by municiplaities and higher education institutions within the State of Connecticut between the 2017 and 2022 fiscal years distributed by municipality. 
+              Circle sizes are proportional to the dollar value of grants obtained. 
+              Feel free to explore the visualization by adjusting filters or just panning and zooming on the map. 
+              If you have questions feel free to reach out to us!
+              </p>
+          </v-card-text>
+          </v-card>
+  </v-dialog>
+
+
 
 <v-dialog
       v-model="showActiveInst"
@@ -234,7 +268,8 @@
         <v-card-title>{{activeInst.Institution_Name}}</v-card-title>
         <v-divider></v-divider>
         <v-card-text style="height: 300px;">
-            <v-simple-table>
+            <v-simple-table
+            >
                 <template v-slot:default>
             <thead>
                 <tr>
@@ -322,14 +357,6 @@
                     <td>{{activeInst.jobs_2022 }}</td>  
                 </tr>
 
-
-
-
-
-
-
-
-
               </tbody>
             </template>
           </v-simple-table>
@@ -363,6 +390,7 @@
         resultsTab: 0,
         activeInst: {},
         showActiveInst:false,
+        showInfoPane:false,
         ins_types: [
           "All",
           "City",
