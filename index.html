@@ -595,16 +595,44 @@
         // },
 
         calculateMarkerDiameter(val) {
-            let max = this.max_award_amount;
-            let percentage = val/max;
-                percentage = percentage*100
+            // let max = this.max_award_amount;
+            // let percentage = val/max;
+            //     percentage = percentage*100
 
-            if(percentage  < 15)
-                return 15;
-            if (percentage > 50) {
-                return 50;
-            }
-            else return percentage;
+            // if(percentage  < 15)
+            //     return 15;
+            // if (percentage > 50) {
+            //     return 50;
+            // }
+            // else return percentage;
+              var award_amount = val;
+            var circle = document.querySelector("#circle");
+            var award_percent_of_max = (award_amount/this.max_award_amount) * 100;
+            
+            console.log("Award Percent of Max");
+            console.log(award_percent_of_max);
+            var min_size = 15;
+            var max_size = 60;
+            
+
+
+
+          switch (true) {
+            case (award_percent_of_max >= 100):
+              diameter = max_size;
+            break;
+              
+            case (award_percent_of_max <= 10):
+              diameter = min_size;
+            break;
+              
+            default:
+              diameter = (award_percent_of_max/100) * max_size;
+            break;
+          }
+
+          return diameter;
+  
 
         },
 
