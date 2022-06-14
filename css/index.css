@@ -110,7 +110,7 @@
 
 nav a{
     text-decoration:none;
-    padding-left:18px!important;
+    
 }
 
 .upper-nav a:hover{
@@ -147,7 +147,7 @@ nav a{
   
   a.parent-title{
     font-size: 13px;
-    padding: 0px 10px;
+    padding: 0px 10px 0 0;
     letter-spacing: 1px;
     text-transform: uppercase;
     color: black!important;
@@ -157,4 +157,12 @@ nav a{
   .upper-nav{
     padding: 20px 0px 6px 0px;
     margin-top:4px;
+  }
+
+  .upper-nav, .navbar {
+    padding-left:15px;
+  }
+
+  .navbar-brand {
+    margin-left:5px;
   }
