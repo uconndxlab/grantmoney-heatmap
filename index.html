@@ -430,6 +430,13 @@
           center: [-72.7, 41.45],
           zoom: 8.5
         });
+        var mq = window.matchMedia("(min-width:1200px)");
+        if (mq.matches){
+          map.setZoom(8.5)
+        }
+        else{
+          map.setZoom(7.5)
+        }
 
         this.map = map;
 
